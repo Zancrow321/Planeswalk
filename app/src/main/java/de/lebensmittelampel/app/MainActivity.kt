@@ -1,13 +1,19 @@
 package de.lebensmittelampel.app
 
 import android.Manifest
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -16,9 +22,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import de.lebensmittelampel.app.design.specFor
 import de.lebensmittelampel.app.notify.ExpiryCheckWorker
 import de.lebensmittelampel.app.notify.Notifications
 import de.lebensmittelampel.app.ui.AppTheme
+import de.lebensmittelampel.app.ui.DesignPickerScreen
 import de.lebensmittelampel.app.ui.ProductEditScreen
 import de.lebensmittelampel.app.ui.ProductListScreen
 import de.lebensmittelampel.app.ui.ProductViewModel
@@ -30,7 +38,20 @@ class MainActivity : ComponentActivity() {
         ExpiryCheckWorker.runNow(this)
 
         setContent {
-            AppTheme {
+            val design by app.designPrefs.design.collectAsStateWithLifecycle()
+            val hintSeen by app.designPrefs.hintSeen.collectAsStateWithLifecycle()
+            val spec = remember(design) { specFor(design) }
+
+            LaunchedEffect(spec.dark) {
+                val style = if (spec.dark) {
+                    SystemBarStyle.dark(Color.TRANSPARENT)
+                } else {
+                    SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+                }
+                enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
+            }
+
+            AppTheme(spec) {
                 val permissionLauncher = rememberLauncherForActivityResult(
                     ActivityResultContracts.RequestPermission(),
                 ) { granted -> if (granted) ExpiryCheckWorker.runNow(this) }
@@ -53,8 +74,13 @@ class MainActivity : ComponentActivity() {
                     composable("liste") {
                         ProductListScreen(
                             viewModel = vm,
+                            hintSeen = hintSeen,
                             onAdd = { nav.navigate("produkt") },
                             onOpen = { id -> nav.navigate("produkt?id=$id") },
+                            onPickDesign = {
+                                app.designPrefs.markHintSeen()
+                                nav.navigate("design")
+                            },
                         )
                     }
                     composable(
@@ -63,6 +89,16 @@ class MainActivity : ComponentActivity() {
                     ) { entry ->
                         val id = entry.arguments?.getLong("id")?.takeIf { it > 0 }
                         ProductEditScreen(viewModel = vm, productId = id, onDone = { nav.popBackStack() })
+                    }
+                    composable("design") {
+                        DesignPickerScreen(
+                            current = design,
+                            onPick = { d ->
+                                app.designPrefs.set(d)
+                                nav.popBackStack()
+                            },
+                            onBack = { nav.popBackStack() },
+                        )
                     }
                 }
             }

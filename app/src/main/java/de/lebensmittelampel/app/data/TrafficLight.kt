@@ -35,3 +35,16 @@ fun remainingText(expiry: LocalDate, today: LocalDate = LocalDate.now()): String
         else -> "noch $days Tage"
     }
 }
+
+/** Sehr kurze Restzeit für Listen: "−5 T", "45 T" oder "7 M". */
+fun restShort(expiry: LocalDate, today: LocalDate = LocalDate.now()): String {
+    val days = ChronoUnit.DAYS.between(today, expiry)
+    return when {
+        days < 0 -> "−${-days} T"
+        days < 60 -> "$days T"
+        else -> "${(days / 30.44).toInt()} M"
+    }
+}
+
+fun daysUntil(expiry: LocalDate, today: LocalDate = LocalDate.now()): Long =
+    ChronoUnit.DAYS.between(today, expiry)

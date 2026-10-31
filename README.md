@@ -16,6 +16,9 @@ Android-App zur Verwaltung von Lebensmitteln nach Mindesthaltbarkeitsdatum (MHD)
 - Einmal täglich prüft die App im Hintergrund alle Produkte. Kommt ein Produkt in den roten Bereich,
   gibt es **genau eine** Benachrichtigung pro Produkt. Wird das MHD später so geändert, dass es nicht mehr rot ist,
   kann es beim nächsten Eintritt in Rot wieder einmal melden.
+- Neun Designs: Radar, Zurück in die Zukunft, Fallout, Retro, Steampunk, Iron Man, Kawaii (Häschen Mimi),
+  90er-Cartoon (Dosen-Dieter) und Schlicht. **Lange auf den Titel der Liste drücken** öffnet die Auswahl.
+- MHD und Menge werden per Wischrädchen eingestellt, die Tastatur braucht man nur für Name und Notiz.
 - Alle Daten bleiben lokal auf dem Handy.
 
 ## Installation

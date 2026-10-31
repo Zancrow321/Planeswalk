@@ -1,29 +1,27 @@
 package de.lebensmittelampel.app.ui
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import de.lebensmittelampel.app.data.TrafficLight
-
-val AmpelRot = Color(0xFFE53935)
-val AmpelGelb = Color(0xFFFBC02D)
-val AmpelGruen = Color(0xFF43A047)
-
-fun TrafficLight.color(): Color = when (this) {
-    TrafficLight.RED -> AmpelRot
-    TrafficLight.YELLOW -> AmpelGelb
-    TrafficLight.GREEN -> AmpelGruen
-}
+import androidx.compose.runtime.CompositionLocalProvider
+import de.lebensmittelampel.app.design.DesignSpec
+import de.lebensmittelampel.app.design.LocalDesign
 
 @Composable
-fun AppTheme(content: @Composable () -> Unit) {
-    val scheme = if (isSystemInDarkTheme()) {
-        darkColorScheme(primary = Color(0xFF81C784), secondary = Color(0xFFFFD54F))
+fun AppTheme(spec: DesignSpec, content: @Composable () -> Unit) {
+    val scheme = if (spec.dark) {
+        darkColorScheme(
+            primary = spec.accent, onPrimary = spec.onAccent, background = spec.bg, onBackground = spec.text,
+            surface = spec.bg, onSurface = spec.text, surfaceContainerHigh = spec.bg,
+        )
     } else {
-        lightColorScheme(primary = Color(0xFF2E7D32), secondary = Color(0xFFF9A825))
+        lightColorScheme(
+            primary = spec.accent, onPrimary = spec.onAccent, background = spec.bg, onBackground = spec.text,
+            surface = spec.bg, onSurface = spec.text, surfaceContainerHigh = spec.bg,
+        )
     }
-    MaterialTheme(colorScheme = scheme, content = content)
+    CompositionLocalProvider(LocalDesign provides spec) {
+        MaterialTheme(colorScheme = scheme, content = content)
+    }
 }

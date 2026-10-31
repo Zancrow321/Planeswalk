@@ -15,6 +15,8 @@ import de.lebensmittelampel.app.MainActivity
 import de.lebensmittelampel.app.R
 import de.lebensmittelampel.app.data.Product
 import de.lebensmittelampel.app.data.remainingText
+import de.lebensmittelampel.app.design.DesignPrefs
+import de.lebensmittelampel.app.design.wordsFor
 import java.time.format.DateTimeFormatter
 
 object Notifications {
@@ -45,10 +47,13 @@ object Notifications {
             context, product.id.toInt(), intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
+        val words = wordsFor(DesignPrefs.read(context))
+        val body = words.notifBody(product.expiry.format(DATE), remainingText(product.expiry))
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("${product.name} ist im roten Bereich")
-            .setContentText("MHD ${product.expiry.format(DATE)}, ${remainingText(product.expiry)}")
+            .setContentTitle(words.notifTitle(product.name))
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
             .setContentIntent(pending)
             .setAutoCancel(true)
             .build()

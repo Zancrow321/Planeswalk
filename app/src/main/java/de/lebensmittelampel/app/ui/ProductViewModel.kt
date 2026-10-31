@@ -15,6 +15,7 @@ import java.time.LocalDate
 
 data class ListState(
     val products: List<Product> = emptyList(),
+    val allProducts: List<Product> = emptyList(),
     val counts: Map<TrafficLight, Int> = emptyMap(),
     val filter: TrafficLight? = null,
     val today: LocalDate = LocalDate.now(),
@@ -31,6 +32,7 @@ class ProductViewModel(
         val today = LocalDate.now()
         ListState(
             products = if (f == null) all else all.filter { it.trafficLight(today) == f },
+            allProducts = all,
             counts = all.groupingBy { it.trafficLight(today) }.eachCount(),
             filter = f,
             today = today,

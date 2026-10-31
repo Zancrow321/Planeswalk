@@ -2,7 +2,7 @@ name: APK bauen
 
 on:
   push:
-    branches: [lebensmittel-ampel]
+    branches: [lebensmittel-ampel, 'lebensmittel-ampel-*']
   workflow_dispatch:
 
 permissions:
@@ -33,6 +33,7 @@ jobs:
           path: Lebensmittel-Ampel.apk
 
       - name: Als Release "Neueste Version" veröffentlichen
+        if: github.ref == 'refs/heads/lebensmittel-ampel'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
