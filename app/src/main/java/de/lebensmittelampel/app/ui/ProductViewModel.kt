@@ -2,6 +2,7 @@ package de.lebensmittelampel.app.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import de.lebensmittelampel.app.data.Category
 import de.lebensmittelampel.app.data.Product
 import de.lebensmittelampel.app.data.ProductRepository
 import de.lebensmittelampel.app.data.TrafficLight
@@ -14,11 +15,24 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 data class ListState(
-    val products: List<Product> = emptyList(),
-    val allProducts: List<Product> = emptyList(),
-    val counts: Map<TrafficLight, Int> = emptyMap(),
+    val all: List<Product> = emptyList(),
     val filter: TrafficLight? = null,
     val today: LocalDate = LocalDate.now(),
+) {
+    fun page(cat: Category): PageState {
+        val inCat = all.filter { it.cat == cat }
+        return PageState(
+            products = if (filter == null) inCat else inCat.filter { it.trafficLight(today) == filter },
+            allProducts = inCat,
+            counts = inCat.groupingBy { it.trafficLight(today) }.eachCount(),
+        )
+    }
+}
+
+data class PageState(
+    val products: List<Product>,
+    val allProducts: List<Product>,
+    val counts: Map<TrafficLight, Int>,
 )
 
 class ProductViewModel(
@@ -30,13 +44,7 @@ class ProductViewModel(
 
     val state: StateFlow<ListState> = combine(repository.products, filter) { all, f ->
         val today = LocalDate.now()
-        ListState(
-            products = if (f == null) all else all.filter { it.trafficLight(today) == f },
-            allProducts = all,
-            counts = all.groupingBy { it.trafficLight(today) }.eachCount(),
-            filter = f,
-            today = today,
-        )
+        ListState(all = all, filter = f, today = today)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ListState())
 
     fun toggleFilter(light: TrafficLight) {

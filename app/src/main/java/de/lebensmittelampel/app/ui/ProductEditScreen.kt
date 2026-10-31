@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import de.lebensmittelampel.app.data.Category
 import de.lebensmittelampel.app.data.Product
 import de.lebensmittelampel.app.data.TrafficLight
 import de.lebensmittelampel.app.design.AppDesign
@@ -45,6 +46,7 @@ import de.lebensmittelampel.app.design.HazardStripe
 import de.lebensmittelampel.app.design.LocalDesign
 import de.lebensmittelampel.app.design.MascotBubble
 import de.lebensmittelampel.app.design.QuantityWheel
+import de.lebensmittelampel.app.design.WheelColumn
 import de.lebensmittelampel.app.design.WheelLabel
 import de.lebensmittelampel.app.design.ZoneIndicator
 import de.lebensmittelampel.app.design.designBackground
@@ -57,6 +59,7 @@ import java.time.LocalDate
 fun ProductEditScreen(
     viewModel: ProductViewModel,
     productId: Long?,
+    initialCategory: Category,
     onDone: () -> Unit,
 ) {
     val s = LocalDesign.current
@@ -69,6 +72,7 @@ fun ProductEditScreen(
     var expiryEpochDay by rememberSaveable { mutableStateOf(LocalDate.now().toEpochDay()) }
     var quantity by rememberSaveable { mutableStateOf<Int?>(null) }
     var note by rememberSaveable { mutableStateOf("") }
+    var category by rememberSaveable { mutableStateOf(initialCategory.name) }
     var status by remember { mutableStateOf<String?>(null) }
     var statusMood by remember { mutableStateOf(TrafficLight.GREEN) }
     var confirmDelete by remember { mutableStateOf(false) }
@@ -83,6 +87,7 @@ fun ProductEditScreen(
                 expiryEpochDay = p.expiryEpochDay
                 quantity = p.quantity
                 note = p.note.orEmpty()
+                category = p.category
             }
             loaded = true
         } else if (productId != null && existing == null) {
@@ -162,6 +167,14 @@ fun ProductEditScreen(
             DateWheel(s, expiry) { expiryEpochDay = it.toEpochDay() }
             ZoneIndicator(s, expiry, name)
 
+            WheelLabel(s, if (s.design in setOf(AppDesign.RADAR, AppDesign.ZEITREISE, AppDesign.ENDZEIT, AppDesign.HUD)) "LISTE" else "Liste")
+            DesignPanel(s, Modifier.fillMaxWidth(), padding = 6.dp) {
+                WheelColumn(
+                    s, Category.entries.map { it.label }, Category.from(category).ordinal,
+                    { i -> category = Category.entries[i].name }, Modifier.fillMaxWidth(),
+                )
+            }
+
             WheelLabel(s, s.words.quantity + " (optional)")
             QuantityWheel(s, quantity) { quantity = it }
 
@@ -179,6 +192,7 @@ fun ProductEditScreen(
                             expiryEpochDay = expiryEpochDay,
                             quantity = quantity,
                             note = note.trim().ifBlank { null },
+                            category = category,
                         ),
                         onDone,
                     )

@@ -36,3 +36,12 @@ class TrafficLightTest {
         assertEquals("seit 4 Tagen abgelaufen", remainingText(today.minusDays(4), today))
     }
 }
+
+class CategoryTest {
+    @Test fun unbekannt_ist_vorrat() = assertEquals(Category.VORRAT, Category.from(null))
+
+    @Test fun tiefkuehl_wird_erkannt() = assertEquals(Category.TIEFKUEHL, Category.from("TIEFKUEHL"))
+
+    @Test fun alte_produkte_sind_vorrat() =
+        assertEquals(Category.VORRAT, Product(name = "Reis", expiryEpochDay = 0).cat)
+}

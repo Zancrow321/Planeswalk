@@ -16,7 +16,11 @@ data class Product(
     val note: String? = null,
     /** Wurde für dieses Produkt die einmalige Rot-Benachrichtigung schon verschickt? */
     @ColumnInfo(name = "red_notified") val redNotified: Boolean = false,
+    /** Liste, zu der das Produkt gehört (Name aus [Category]). */
+    @ColumnInfo(name = "category", defaultValue = "'VORRAT'") val category: String = Category.VORRAT.name,
 ) {
+    val cat: Category get() = Category.from(category)
+
     val expiry: LocalDate get() = LocalDate.ofEpochDay(expiryEpochDay)
 
     fun trafficLight(today: LocalDate = LocalDate.now()) = TrafficLight.of(expiry, today)

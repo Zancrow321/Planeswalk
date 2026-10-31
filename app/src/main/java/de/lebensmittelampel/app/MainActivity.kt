@@ -22,6 +22,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import de.lebensmittelampel.app.data.Category
 import de.lebensmittelampel.app.design.specFor
 import de.lebensmittelampel.app.notify.ExpiryCheckWorker
 import de.lebensmittelampel.app.notify.Notifications
@@ -75,7 +76,7 @@ class MainActivity : ComponentActivity() {
                         ProductListScreen(
                             viewModel = vm,
                             hintSeen = hintSeen,
-                            onAdd = { nav.navigate("produkt") },
+                            onAdd = { cat -> nav.navigate("produkt?cat=${cat.name}") },
                             onOpen = { id -> nav.navigate("produkt?id=$id") },
                             onPickDesign = {
                                 app.designPrefs.markHintSeen()
@@ -84,11 +85,15 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable(
-                        "produkt?id={id}",
-                        arguments = listOf(navArgument("id") { type = NavType.LongType; defaultValue = -1L }),
+                        "produkt?id={id}&cat={cat}",
+                        arguments = listOf(
+                            navArgument("id") { type = NavType.LongType; defaultValue = -1L },
+                            navArgument("cat") { type = NavType.StringType; defaultValue = Category.VORRAT.name },
+                        ),
                     ) { entry ->
                         val id = entry.arguments?.getLong("id")?.takeIf { it > 0 }
-                        ProductEditScreen(viewModel = vm, productId = id, onDone = { nav.popBackStack() })
+                        val cat = Category.from(entry.arguments?.getString("cat"))
+                        ProductEditScreen(viewModel = vm, productId = id, initialCategory = cat, onDone = { nav.popBackStack() })
                     }
                     composable("design") {
                         DesignPickerScreen(

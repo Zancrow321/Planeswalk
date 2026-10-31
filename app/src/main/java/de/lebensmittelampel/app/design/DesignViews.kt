@@ -57,6 +57,7 @@ fun ListHeader(
     products: List<Product>,
     counts: Map<TrafficLight, Int>,
     today: LocalDate,
+    listName: String,
     onLongPress: () -> Unit,
 ) {
     val total = counts.values.sum()
@@ -76,7 +77,7 @@ fun ListHeader(
                 ) {
                     DTitle(s.words.appTitle, s)
                     Grow()
-                    DText("SEKTOR KÜCHE · $total KONTAKTE", s, size = 9.sp, color = s.muted)
+                    DText("SEKTOR ${listName.uppercase()} · $total KONTAKTE", s, size = 9.sp, color = s.muted)
                 }
                 Spacer(Modifier.height(8.dp))
                 RadarScope(products, today, s)
@@ -94,7 +95,7 @@ fun ListHeader(
                 Row(Modifier.fillMaxWidth().border(2.dp, s.accent).padding(horizontal = 8.dp, vertical = 2.dp)) {
                     DTitle(s.words.appTitle, s, size = 22.sp)
                     Grow()
-                    DText(s.words.listCaption, s, size = 22.sp)
+                    DText(listName.uppercase(), s, size = 22.sp, maxLines = 1)
                 }
                 Spacer(Modifier.height(4.dp))
                 DText("> VORRAT: $total EINTRÄGE", s, Modifier.fillMaxWidth())
@@ -428,5 +429,32 @@ fun DesignTile(design: AppDesign, selected: Boolean, labelColor: Color, onClick:
             textAlign = TextAlign.Center,
             style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = labelColor),
         )
+    }
+}
+
+/** Zeigt, welche Liste offen ist; gewechselt wird per seitlichem Wischen. */
+@Composable
+fun PageIndicator(s: DesignSpec, names: List<String>, current: Int) {
+    val upper = s.design in setOf(AppDesign.RADAR, AppDesign.ZEITREISE, AppDesign.ENDZEIT, AppDesign.HUD, AppDesign.CARTOON)
+    Row(
+        Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        DText(if (current > 0) "‹ " else "  ", s, size = 16.sp, color = s.muted, glow = false)
+        names.forEachIndexed { i, n ->
+            if (i > 0) DText("  ·  ", s, size = 13.sp, color = s.muted, glow = false)
+            val on = i == current
+            DText(
+                if (upper) n.uppercase() else n, s,
+                size = if (on) 15.sp else 13.sp,
+                color = if (on) (if (s.design == AppDesign.KAWAII) Color(0xFFE0457B) else s.text) else s.muted,
+                weight = if (on) FontWeight.Bold else s.bodyWeight,
+                font = if (s.design == AppDesign.CARTOON) Fonts.bangers else s.bodyFont,
+                glow = on && s.glow,
+                maxLines = 1,
+            )
+        }
+        DText(if (current < names.lastIndex) " ›" else "  ", s, size = 16.sp, color = s.muted, glow = false)
     }
 }
