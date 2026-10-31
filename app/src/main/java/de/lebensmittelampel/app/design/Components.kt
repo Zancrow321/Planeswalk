@@ -233,7 +233,7 @@ fun DesignButton(
         AppDesign.STEAMPUNK -> Color(0xFF1C0F06)
         else -> null
     }
-    val (font, weight, size, spacing) = when (s.design) {
+    val (font, weight, fSize, spacing) = when (s.design) {
         AppDesign.RADAR -> Quad(Fonts.shareTech, FontWeight.Normal, 14.sp, 2.sp)
         AppDesign.ZEITREISE -> Quad(Fonts.orbitron, FontWeight.Black, 12.sp, 2.sp)
         AppDesign.ENDZEIT -> Quad(Fonts.vt323, FontWeight.Normal, 22.sp, 1.sp)
@@ -270,7 +270,7 @@ fun DesignButton(
             text,
             textAlign = TextAlign.Center,
             style = TextStyle(
-                fontFamily = font, fontWeight = weight, fontSize = size, letterSpacing = spacing, color = fg,
+                fontFamily = font, fontWeight = weight, fontSize = fSize, letterSpacing = spacing, color = fg,
                 shadow = if (s.design == AppDesign.CARTOON) androidx.compose.ui.graphics.Shadow(Color(0xFF111111), Offset(3f, 3f)) else null,
             ),
         )
