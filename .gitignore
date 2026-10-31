@@ -1,0 +1,55 @@
+# ---- Unity ----
+unity/**/[Ll]ibrary/
+unity/**/[Tt]emp/
+unity/**/[Oo]bj/
+unity/**/[Bb]uild/
+unity/**/[Bb]uilds/
+unity/**/[Ll]ogs/
+unity/**/[Uu]ser[Ss]ettings/
+unity/**/[Mm]emoryCaptures/
+unity/**/[Rr]ecordings/
+unity/**/Assets/Plugins/Editor/JetBrains*
+unity/**/Assets/AssetStoreTools*
+.vs/
+.vscode/
+.idea/
+.gradle/
+ExportedObj/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+sysinfo.txt
+*.apk
+*.aab
+*.unitypackage
+*.app
+crashlytics-build.properties
+# Gekaufte Asset-Store-Pakete (Lizenz!) nicht ins Repo
+unity/**/Assets/ThirdParty/
+
+# ---- Java / Forge-Server ----
+server/**/target/
+server/**/build/
+*.class
+*.log
+# Gecachte Kartendaten/Bilder von Scryfall
+server/**/cache/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
